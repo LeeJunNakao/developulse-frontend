@@ -1,29 +1,14 @@
 # frontend
 
-## Project setup
-```
-yarn install
-```
+## Instructions
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+### To run inside docker
 
-### Compiles and minifies for production
-```
-yarn build
-```
+- Run server: `docker-compose run --service-ports app`
 
-### Run your unit tests
-```
-yarn test:unit
-```
+## To run outside docker
 
-### Lints and fixes files
-```
-yarn lint
-```
+- Install packages: `yarn install`
+- Run server: `yarn serve`
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+

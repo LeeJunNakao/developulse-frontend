@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  vueapp:
+    hostname: vueapp
+    image: developulse_front
+    stdin_open: true
+    tty: true
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/usr/front
+      - /usr/front/node_modules
+    environment:
+      - PORT=8080
+      - SUBMIT_URL=https://imc-hiring-test.azurewebsites.net/Contact/Save
+    command: "yarn serve"
