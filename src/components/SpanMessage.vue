@@ -1,6 +1,8 @@
 <template>
   <div class="span-message-wrapper">
-    <span class="span-message-component">{{ text }}</span>
+    <span class="span-message-component" data-test="span-message">{{
+      text
+    }}</span>
   </div>
 </template>
 

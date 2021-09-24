@@ -5,6 +5,7 @@
       v-model="content"
       :placeholder="placeholder"
       :maxlength="maxLength"
+      data-test="input"
     />
   </div>
 </template>

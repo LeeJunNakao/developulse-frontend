@@ -1,6 +1,8 @@
 <template>
   <div class="button-wrapper">
-    <button class="button-component" @click="onClick">{{ label }}</button>
+    <button class="button-component" @click="onClick" data-test="button">
+      {{ label }}
+    </button>
   </div>
 </template>
 

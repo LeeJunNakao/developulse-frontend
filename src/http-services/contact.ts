@@ -13,9 +13,9 @@ interface ContactData {
   Email: string;
 }
 
-export const submitContact = async (
+export async function submitContact(
   data: ContactData
-): Promise<SubmitContactResponse> => {
+): Promise<SubmitContactResponse> {
   const response = await client.post<SubmitContactResponse>("", data);
   return response.data;
-};
+}

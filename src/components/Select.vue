@@ -5,6 +5,7 @@
       class="select-component"
       :class="{ blank: !selected }"
       :disabled="isDisabled"
+      data-test="select"
     >
       <option value="" disabled selected hidden>
         {{ placeholder }}

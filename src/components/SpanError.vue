@@ -1,6 +1,6 @@
 <template>
   <div class="span-error-wrapper">
-    <span class="span-error-component">{{ text }}</span>
+    <span class="span-error-component" data-test="span-error">{{ text }}</span>
   </div>
 </template>
 

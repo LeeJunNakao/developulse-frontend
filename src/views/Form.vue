@@ -1,7 +1,7 @@
 <template>
   <div class="form-wrapper">
     <div class="form">
-      <Title text="Contact Us" />
+      <Title text="Contact Us" data-test="title" />
       <div
         v-show="
           formStatus === Phase.SUBMITED_SUCCESS ||
@@ -11,6 +11,7 @@
         :class="{
           fail: formStatus === Phase.SUBMITED_FAIL,
         }"
+        data-test="submit-message"
       >
         <SpanMessage :text="submitionMessage" />
       </div>
@@ -18,7 +19,7 @@
         class="form-inputs"
         :class="{ validating: formStatus === Phase.VALIDATE }"
       >
-        <div class="form-input">
+        <div class="form-input" data-test="first-name">
           <Input
             placeholder="First Name"
             ref="firstNameInput"
@@ -27,12 +28,12 @@
           <SpanError :text="formValidation.firstName" />
         </div>
 
-        <div class="form-input">
+        <div class="form-input" data-test="last-name">
           <Input placeholder="Last Name" ref="lastNameInput" :maxLength="40" />
           <SpanError :text="formValidation.lastName" />
         </div>
 
-        <div class="form-input">
+        <div class="form-input" data-test="address">
           <Input
             placeholder="Street Address"
             ref="addressInput"
@@ -41,7 +42,7 @@
           <SpanError :text="formValidation.address" />
         </div>
 
-        <div class="form-input">
+        <div class="form-input" data-test="address-complement">
           <Input
             placeholder="Unit/Apt"
             ref="addressComplInput"
@@ -50,21 +51,21 @@
           <SpanError :text="formValidation.addressCompl" />
         </div>
 
-        <div class="form-input">
+        <div class="form-input" data-test="province">
           <Select
-            :options="provincieOptions"
+            :options="provinceOptions"
             placeholder="Province/Territory/State"
             ref="provinceInput"
           />
           <SpanError :text="formValidation.province" />
         </div>
 
-        <div class="form-input">
+        <div class="form-input" data-test="city">
           <Select :options="cityOptions" placeholder="City" ref="cityInput" />
           <SpanError :text="formValidation.city" />
         </div>
 
-        <div class="form-input">
+        <div class="form-input" data-test="email">
           <Input
             placeholder="Email"
             class="form-input"
@@ -74,7 +75,7 @@
           <SpanError :text="formValidation.email" />
         </div>
       </div>
-      <div class="form-buttons">
+      <div class="form-buttons" data-test="submit-button">
         <Button label="SUBMIT" :onClick="submit" />
       </div>
     </div>
@@ -127,7 +128,6 @@ export default defineComponent({
     const store = useStore();
 
     const formStatus = ref<Phase>(Phase.INITIAL);
-    watch(formStatus, (status) => console.log("status!", status));
 
     const firstNameInput = ref<InstanceType<typeof Input> | null>(null);
     const lastNameInput = ref<InstanceType<typeof Input> | null>(null);
@@ -138,9 +138,10 @@ export default defineComponent({
     const emailInput = ref<InstanceType<typeof Input> | null>(null);
 
     const selectedProvince = computed(() => provinceInput.value?.selected);
-    const provincieOptions = Object.entries(provicies).map(
-      ([label, value]) => ({ label, value })
-    );
+    const provinceOptions = Object.entries(provicies).map(([label, value]) => ({
+      label,
+      value,
+    }));
     const cityOptions = computed(() => {
       const cities =
         store.getters["cities/getCitiesByProvince"](selectedProvince.value) ||
@@ -182,6 +183,7 @@ export default defineComponent({
     const submit = async () => {
       formStatus.value = Phase.VALIDATE;
       const isFormValid = Object.values(formValidation.value).every((i) => !i);
+
       if (isFormValid) {
         try {
           await contactService.submitContact(formData.value);
@@ -208,7 +210,7 @@ export default defineComponent({
       provinceInput,
       cityInput,
       emailInput,
-      provincieOptions,
+      provinceOptions,
       cityOptions,
       formValidation,
       submit,
