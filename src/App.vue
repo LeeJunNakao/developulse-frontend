@@ -1,27 +1,28 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <Form />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import HelloWorld from "./components/HelloWorld.vue";
+import { defineComponent, onMounted } from "vue";
+import Form from "@/views/Form.vue";
+import { getAllProvincesCities } from "@/services/citites";
 
 export default defineComponent({
   name: "App",
   components: {
-    HelloWorld,
+    Form,
+  },
+  setup() {
+    onMounted(() => {
+      getAllProvincesCities();
+    });
   },
 });
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
 }
 </style>
