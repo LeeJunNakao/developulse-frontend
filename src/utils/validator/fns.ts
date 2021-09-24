@@ -1,13 +1,16 @@
-export type validationFn = (value: string, ...fns: any) => boolean;
+import { errorMessages } from "./error-messages";
+export type validationFn = (value: string) => string;
 
-export const required: validationFn = (value: string): boolean =>
-  Boolean(value);
-export const maxLength: validationFn = (
-  value: string,
-  length: number
-): boolean => value.length <= length;
-export const validEmail: validationFn = (value: string): boolean => {
+export const required = (value: string): string =>
+  value ? "" : errorMessages.required();
+
+export const maxLength =
+  (length: number): validationFn =>
+  (value: string): string =>
+    value.length <= length ? "" : errorMessages.maxLength(length);
+
+export const validEmail: validationFn = (value: string): string => {
   const re =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(String(value).toLowerCase());
+  return re.test(String(value).toLowerCase()) ? "" : errorMessages.validEmail();
 };

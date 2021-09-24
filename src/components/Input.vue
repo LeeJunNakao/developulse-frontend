@@ -4,6 +4,7 @@
       class="input-component"
       v-model="content"
       :placeholder="placeholder"
+      :maxlength="maxLength"
     />
   </div>
 </template>
@@ -15,6 +16,7 @@ export default defineComponent({
   name: "Input",
   props: {
     placeholder: [String, Number],
+    maxLength: Number,
   },
   setup() {
     const content = ref<string>("");

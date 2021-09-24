@@ -6,7 +6,6 @@ export const getCities = async (provinceCode: string): Promise<void> => {
   const store = useStore();
 
   const { Items: cities } = await citiesService.getCities(provinceCode);
-  console.log("@@!!", provinceCode, cities);
 
   store.dispatch("cities/setCities", {
     provinceCode,

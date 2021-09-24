@@ -1,17 +1,18 @@
-import axios from "axios";
+import Axios, { AxiosResponse, AxiosInstance } from "axios";
 
-interface HttpResponse<T> {
-  status: number;
-  data: T;
-}
+const makeClient = (client: AxiosInstance) => ({
+  async get<Type>(url: string): Promise<AxiosResponse<Type>> {
+    return client.get(url);
+  },
+  async post<Type>(url: string, data: any): Promise<AxiosResponse<Type>> {
+    console.log("POST!!", url, data);
+    return client.post(url, data);
+  },
+});
 
-export const post = async <Type>(
-  url: string,
-  data: any
-): Promise<HttpResponse<Type>> => {
-  return axios.post(url, data);
-};
+const axios = Axios.create({
+  baseURL: process.env.VUE_APP_CONTACT_URL,
+  headers: { token: localStorage.getItem("token") },
+});
 
-export const get = async <Type>(url: string): Promise<HttpResponse<Type>> => {
-  return axios.get(url);
-};
+export const client = makeClient(axios);

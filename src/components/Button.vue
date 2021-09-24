@@ -26,8 +26,9 @@ export default defineComponent({
   .button-component {
     min-width: 50px;
     padding: 10px;
-    background-color: white;
-    border: 1px solid black;
+    background-color: $button-color;
+    color: $button-text-color;
+    border: 1px solid $button-border-color;
     border-radius: 2px;
 
     &:hover {
@@ -35,9 +36,9 @@ export default defineComponent({
     }
 
     &:active {
-      background-color: #22577a;
-      border: 1px solid white;
-      color: white;
+      background-color: $button-active-bg-color;
+      color: $button-active-text-color;
+      border: 1px solid $button-active-border-color;
     }
   }
 }

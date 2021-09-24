@@ -2,39 +2,80 @@
   <div class="form-wrapper">
     <div class="form">
       <Title text="Contact Us" />
-      <div class="form-inputs">
-        <Input
-          placeholder="First Name"
-          class="form-input"
-          ref="firstNameInput"
-        />
-        <Input placeholder="Last Name" class="form-input" ref="lastNameInput" />
-        <Input
-          placeholder="Street Address"
-          class="form-input"
-          ref="addressInput"
-        />
-        <Input
-          placeholder="Unit/Apt"
-          class="form-input"
-          ref="addressComplInput"
-        />
-        <Select
-          :options="provincieOptions"
-          placeholder="Province/Territory/State"
-          class="form-input"
-          ref="provinceInput"
-        />
-        <Select
-          :options="cityOptions"
-          placeholder="City"
-          class="form-input"
-          ref="cityInput"
-        />
-        <Input placeholder="Email" class="form-input" ref="emailInput" />
+      <div
+        v-show="
+          formStatus === Phase.SUBMITED_SUCCESS ||
+          formStatus === Phase.SUBMITED_FAIL
+        "
+        class="message"
+        :class="{
+          fail: formStatus === Phase.SUBMITED_FAIL,
+        }"
+      >
+        <SpanMessage :text="submitionMessage" />
+      </div>
+      <div
+        class="form-inputs"
+        :class="{ validating: formStatus === Phase.VALIDATE }"
+      >
+        <div class="form-input">
+          <Input
+            placeholder="First Name"
+            ref="firstNameInput"
+            :maxLength="40"
+          />
+          <SpanError :text="formValidation.firstName" />
+        </div>
+
+        <div class="form-input">
+          <Input placeholder="Last Name" ref="lastNameInput" :maxLength="40" />
+          <SpanError :text="formValidation.lastName" />
+        </div>
+
+        <div class="form-input">
+          <Input
+            placeholder="Street Address"
+            ref="addressInput"
+            :maxLength="128"
+          />
+          <SpanError :text="formValidation.address" />
+        </div>
+
+        <div class="form-input">
+          <Input
+            placeholder="Unit/Apt"
+            ref="addressComplInput"
+            :maxLength="128"
+          />
+          <SpanError :text="formValidation.addressCompl" />
+        </div>
+
+        <div class="form-input">
+          <Select
+            :options="provincieOptions"
+            placeholder="Province/Territory/State"
+            ref="provinceInput"
+          />
+          <SpanError :text="formValidation.province" />
+        </div>
+
+        <div class="form-input">
+          <Select :options="cityOptions" placeholder="City" ref="cityInput" />
+          <SpanError :text="formValidation.city" />
+        </div>
+
+        <div class="form-input">
+          <Input
+            placeholder="Email"
+            class="form-input"
+            ref="emailInput"
+            :maxLength="128"
+          />
+          <SpanError :text="formValidation.email" />
+        </div>
       </div>
       <div class="form-buttons">
-        <Button label="SUBMIT" />
+        <Button label="SUBMIT" :onClick="submit" />
       </div>
     </div>
   </div>
@@ -47,9 +88,12 @@ import Title from "@/components/Title.vue";
 import Input from "@/components/Input.vue";
 import Select from "@/components/Select.vue";
 import { provicies } from "@/utils/content";
-// import { validator, required, maxLength, validEmail} from "@/utils/validator";
+import { validate, required, validEmail } from "@/utils/validator";
 import Button from "@/components/Button.vue";
 import { getCities } from "@/services/citites";
+import SpanError from "@/components/SpanError.vue";
+import SpanMessage from "@/components/SpanMessage.vue";
+import { contactService } from "@/http-services";
 
 interface SubmitionData {
   Name: string;
@@ -61,18 +105,29 @@ interface SubmitionData {
 }
 
 interface FormValidation {
-  name: boolean;
-  address: boolean;
-  addressCompl: boolean;
-  province: boolean;
-  city: boolean;
-  email: boolean;
+  firstName: string;
+  lastName: string;
+  address: string;
+  addressCompl: string;
+  province: string;
+  city: string;
+  email: string;
+}
+
+enum Phase {
+  INITIAL = 1,
+  VALIDATE = 2,
+  SUBMITED_SUCCESS = 3,
+  SUBMITED_FAIL = 4,
 }
 
 export default defineComponent({
   name: "Form",
   setup() {
     const store = useStore();
+
+    const formStatus = ref<Phase>(Phase.INITIAL);
+    watch(formStatus, (status) => console.log("status!", status));
 
     const firstNameInput = ref<InstanceType<typeof Input> | null>(null);
     const lastNameInput = ref<InstanceType<typeof Input> | null>(null);
@@ -83,11 +138,9 @@ export default defineComponent({
     const emailInput = ref<InstanceType<typeof Input> | null>(null);
 
     const selectedProvince = computed(() => provinceInput.value?.selected);
-
     const provincieOptions = Object.entries(provicies).map(
       ([label, value]) => ({ label, value })
     );
-
     const cityOptions = computed(() => {
       const cities =
         store.getters["cities/getCitiesByProvince"](selectedProvince.value) ||
@@ -106,16 +159,38 @@ export default defineComponent({
       })
     );
 
-    const formValidation = computed(
-      (): FormValidation => ({
-        name: false,
-        address: false,
-        addressCompl: false,
-        province: false,
-        city: false,
-        email: false,
-      })
+    const formValidation = computed((): FormValidation => {
+      const firstName = firstNameInput.value?.content || "";
+      const lastName = lastNameInput.value?.content || "";
+      const { Address, Address2, City, Province, Email } = formData.value;
+
+      return {
+        firstName: validate(firstName, required),
+        lastName: validate(lastName, required),
+        address: validate(Address, required),
+        addressCompl: validate(Address2, required),
+        province: validate(Province, required),
+        city: validate(City, required),
+        email: validate(Email, required, validEmail),
+      };
+    });
+
+    const submitionMessage = computed(() =>
+      formStatus.value === 3 ? "Submited Successfully" : "Failed to submit"
     );
+
+    const submit = async () => {
+      formStatus.value = Phase.VALIDATE;
+      const isFormValid = Object.values(formValidation.value).every((i) => !i);
+      if (isFormValid) {
+        try {
+          await contactService.submitContact(formData.value);
+          formStatus.value = Phase.SUBMITED_SUCCESS;
+        } catch (error) {
+          formStatus.value = Phase.SUBMITED_FAIL;
+        }
+      }
+    };
 
     watch(
       selectedProvince,
@@ -135,6 +210,11 @@ export default defineComponent({
       emailInput,
       provincieOptions,
       cityOptions,
+      formValidation,
+      submit,
+      submitionMessage,
+      formStatus,
+      Phase,
     };
   },
   components: {
@@ -142,13 +222,13 @@ export default defineComponent({
     Title,
     Select,
     Button,
+    SpanError,
+    SpanMessage,
   },
 });
 </script>
 
 <style lang="scss" scoped>
-$background-color: #b5deff;
-
 .form-wrapper {
   display: flex;
   justify-content: center;
@@ -158,8 +238,18 @@ $background-color: #b5deff;
   height: 100vh;
 
   .form {
-    background-color: #fbf4e9;
+    background-color: $background-form-color;
     padding: 20px;
+
+    .message:deep {
+      &.fail {
+        .span-message-wrapper {
+          .span-message-component {
+            color: $red;
+          }
+        }
+      }
+    }
 
     .form-inputs {
       padding-top: 20px;
@@ -168,6 +258,15 @@ $background-color: #b5deff;
 
       .form-input + .form-input {
         margin-top: 10px;
+      }
+
+      .form-input:deep .span-error-component {
+        margin-left: 5px;
+        opacity: 0;
+      }
+
+      &.validating:deep .span-error-component {
+        opacity: 1;
       }
     }
     .form-buttons {
