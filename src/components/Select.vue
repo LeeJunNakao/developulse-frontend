@@ -42,10 +42,12 @@ export default defineComponent({
     const isDisabled = computed(
       () => options.value?.length === 0 || Boolean(!options.value)
     );
+    const clear = () => (selected.value = "");
 
     return {
       selected,
       isDisabled,
+      clear,
     };
   },
 });

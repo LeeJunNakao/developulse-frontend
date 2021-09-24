@@ -180,6 +180,16 @@ export default defineComponent({
       formStatus.value === 3 ? "Submited Successfully" : "Failed to submit"
     );
 
+    const clearForm = () => {
+      firstNameInput.value?.clear();
+      lastNameInput.value?.clear();
+      addressInput.value?.clear();
+      addressComplInput.value?.clear();
+      cityInput.value?.clear();
+      provinceInput.value?.clear();
+      emailInput.value?.clear();
+    };
+
     const submit = async () => {
       formStatus.value = Phase.VALIDATE;
       const isFormValid = Object.values(formValidation.value).every((i) => !i);
@@ -188,6 +198,7 @@ export default defineComponent({
         try {
           await contactService.submitContact(formData.value);
           formStatus.value = Phase.SUBMITED_SUCCESS;
+          clearForm();
         } catch (error) {
           formStatus.value = Phase.SUBMITED_FAIL;
         }

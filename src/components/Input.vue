@@ -21,9 +21,11 @@ export default defineComponent({
   },
   setup() {
     const content = ref<string>("");
+    const clear = () => (content.value = "");
 
     return {
       content,
+      clear,
     };
   },
 });
